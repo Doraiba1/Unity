@@ -22,17 +22,17 @@ public class PlayerControl : MonoBehaviour
     void Update()
     {
         if (Hp <= 0) { return; }
-        float horizontal = Input.GetAxis("Hroizontal");
+        float horizontal = Input.GetAxis("Horizontal");
         if (horizontal != 0)
         {
-            transform.Translate(transform.right * 1 * Time.deltaTime * horizontal);
+            transform.Translate(transform.right * 5 * Time.deltaTime * horizontal);
             if (horizontal < 0)
             {
-                sr.flipX = true;
+                sr.flipX = false;
             }
             if (horizontal > 0)
             {
-                sr.flipX = false;
+                sr.flipX = true;
             }
             
         }
