@@ -35,6 +35,8 @@ public class Enemy_1_Controller : MonoBehaviour
     public float findRange = 10f;
     //敌人攻击玩家的距离
     public float attackRange = 5f;
+    //敌人攻击力
+    public int attack_Value = 20;
     // Start is called before the first frame update
     void Start()
     {
@@ -44,6 +46,7 @@ public class Enemy_1_Controller : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
         startXPos = transform.position.x;
         player = GameObject.FindWithTag("Player");
+        ani.SetFloat("ForwardSpeed", moveSpeed);
     }
 
     // Update is called once per frame
@@ -54,15 +57,6 @@ public class Enemy_1_Controller : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        //计算要移动的距离
-        float distenceToMove = moveSpeed * Time.deltaTime;
-
-        //移动敌人,并根据移动范围反转移动方向
-        transform.position += new Vector3(distenceToMove * moveDirection, 0, 0);
-        if (Mathf.Abs(transform.position.x - startXPos) > moveRange / 2)
-        {
-            moveDirection *= -1;
-        }
         Flip();
         Attack_Player();
     }
@@ -104,22 +98,46 @@ public class Enemy_1_Controller : MonoBehaviour
 
         if (PToE_distence <= findRange && PToE_distence >attackRange)
         {
-            if(isPinE_Right == true)
+            //ani.SetTrigger("Is_Attack");
+            if (Mathf.Abs(transform.position.x - player.transform.position.x) > 2)
             {
-                sr.flipX = false;
-                moveDirection = 1;
+                if (isPinE_Right == true)
+                {
+                  sr.flipX = false;
+                   moveDirection = 1;
             }
-            if(isPinE_Right == false)
-            {
-                sr.flipX = true;
-                moveDirection = -1;
+                 if(isPinE_Right == false)
+                 {
+                   sr.flipX = true;
+                    moveDirection = -1;
+                 }
             }
+
+            //使敌人靠近玩家
             Vector2 targetPos = new Vector2(player.transform.position.x, transform.position.y); 
             transform.position = Vector2.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+
         }
         if(PToE_distence <= attackRange)
         {
-            player.GetComponent<PlayerControl>().Hp -= 20;
+            //播放攻击动画
+            ani.SetTrigger("Is_Attack");
+            //使敌人攻击时停止移动
+            rBody.velocity = Vector2.zero; 
+            //使玩家减少20点血量
+            player.GetComponent<PlayerControl>().Hp -= attack_Value;
+        }
+        if(PToE_distence > findRange)
+        {
+            //计算要移动的距离
+            float distenceToMove = moveSpeed * Time.deltaTime;
+
+            //移动敌人,并根据移动范围反转移动方向
+            transform.position += new Vector3(distenceToMove * moveDirection, 0, 0);
+            if (Mathf.Abs(transform.position.x - startXPos) > moveRange / 2)
+            {
+                moveDirection *= -1;
+            }
         }
     }
 
